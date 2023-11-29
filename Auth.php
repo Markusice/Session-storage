@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 class Auth
 {
-    private IStorage $user_storage;
+    private IStorage $userStorage;
     private ?array $user = null;
 
     public function __construct(IStorage $user_storage)
     {
-        $this->user_storage = $user_storage;
+        $this->userStorage = $user_storage;
 
         if (isset($_SESSION['user'])) {
             $this->user = $_SESSION['user'];
@@ -23,18 +23,18 @@ class Auth
             'password' => password_hash($data['password'], PASSWORD_DEFAULT),
             'roles' => ['user'],
         ];
-        return $this->user_storage->add($user);
+        return $this->userStorage->add($user);
     }
 
     public function userExists($username): bool
     {
-        $users = $this->user_storage->findOne(['username' => $username]);
+        $users = $this->userStorage->findOne(['username' => $username]);
         return !is_null($users);
     }
 
     public function authenticate($username, #[SensitiveParameter] $password): ?array
     {
-        $users = $this->user_storage->findMany(function ($user) use ($username, $password) {
+        $users = $this->userStorage->findMany(function ($user) use ($username, $password) {
             return $user['username'] === $username &&
                 password_verify($password, $user['password']);
         });
