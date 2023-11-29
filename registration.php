@@ -45,6 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <div class="grid gap-y-2">
                 <label for="username">Felhasználónév:</label>
                 <input type="text" name="username" id="username" value="<?= $_POST['username'] ?? '' ?>"
+                       autocomplete="username"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5">
 
                 <?php if (isset($errors['username'])): ?>
@@ -54,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div class="grid gap-y-2">
                 <label for="password">Jelszó:</label>
-                <input type="password" name="password" id="password"
+                <input type="password" name="password" id="password" autocomplete="new-password"
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5">
                 <?php if (isset($errors['password'])): ?>
                     <span class="error"><?= $errors['password'] ?></span>
