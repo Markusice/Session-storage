@@ -108,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
             <div>
                 <p>Humidity: <?= $data['main']['humidity']; ?>%</p>
+                <p>Pressure: <?= $data['main']['pressure']; ?> hPa</p>
                 <p>Wind: <?= $data['wind']['speed']; ?> km/h</p>
             </div>
         </div>
