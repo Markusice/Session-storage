@@ -9,9 +9,14 @@ require_once '../utils.php';
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
 $dotenv->load();
 
-function getAPIKey(): string
+function getWeatherAPIKey(): string
 {
-    return $_ENV['API_KEY'];
+    return $_ENV['OPEN_WEATHER_MAP_KEY'];
+}
+
+function getGoogleAPIKey(): string
+{
+    return $_ENV['GOOGLE_MAPS_KEY'];
 }
 
 function getResponseFromURL(string $URL): mixed
@@ -37,13 +42,13 @@ function getResponseFromURL(string $URL): mixed
 function requestLocationDataByCityName(string $cityName): array | false
 {
     $cityName = urlencode($cityName);
-    $geocodingAPIUrl = "https://api.openweathermap.org/geo/1.0/direct?q=$cityName&appid=" . getAPIKey();
+    $geocodingAPIUrl = "https://api.openweathermap.org/geo/1.0/direct?q=$cityName&appid=" . getWeatherAPIKey();
     return getResponseFromURL($geocodingAPIUrl) ?: false;
 }
 
 function requestCurrentWeatherDataByLatLon(float $lat, float $lon): array
 {
-    $currentWeatherAPI = "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=" . getAPIKey() . '&units=metric';
+    $currentWeatherAPI = "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=" . getWeatherAPIKey() . '&units=metric';
     return getResponseFromURL($currentWeatherAPI);
 }
 
@@ -80,7 +85,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="../dist/output.css">
 </head>
 <body class="dark:bg-[#121212] dark:text-white">
-<div class="p-4 grid gap-y-5">
+<div class="p-6 grid grid-cols-[repeat(2,max-content)] gap-6">
     <form method="post" action="">
         <div class="form-items grid gap-y-3 text-lg">
             <div class="grid gap-y-2">
@@ -95,7 +100,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </form>
 
     <?php if (isset($data)): ?>
-        <div class="text-lg font-medium grid gap-y-1 bg-indigo-100 p-4 rounded-lg w-max text-indigo-950">
+        <div class="row-start-2 text-lg font-medium grid gap-y-1 bg-indigo-100 p-4 rounded-lg w-max text-indigo-950">
             <h2 class="text-3xl">Forecast for <?= $data['name']; ?>
                 - <?php if (isset($formattedTime)): ?><?= $formattedTime ?><?php endif; ?>
             </h2>
@@ -120,6 +125,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     <?php endif; ?>
+
+    <div id="map" class="row-start-2 h-[400px] w-[800px] rounded-md"></div>
 </div>
+<script>
+    (g => {
+        let h, a, k, p = "The Google Maps JavaScript API", c = "google", l = "importLibrary", q = "__ib__",
+            m = document, b = window;
+        b = b[c] || (b[c] = {});
+        const d = b.maps || (b.maps = {}), r = new Set, e = new URLSearchParams,
+            u = () => h || (h = new Promise(async (f, n) => {
+                await (a = m.createElement("script"));
+                e.set("libraries", [...r] + "");
+                for (k in g) e.set(k.replace(/[A-Z]/g, t => "_" + t[0].toLowerCase()), g[k]);
+                e.set("callback", c + ".maps." + q);
+                a.src = `https://maps.${c}apis.com/maps/api/js?` + e;
+                d[q] = f;
+                a.onerror = () => h = n(Error(p + " could not load."));
+                a.nonce = m.querySelector("script[nonce]")?.nonce || "";
+                m.head.append(a)
+            }));
+        d[l] ? console.warn(p + " only loads once. Ignoring:", g) : d[l] = (f, ...n) => r.add(f) && u().then(() => d[l](f, ...n))
+    })({
+        key: "<?= getGoogleAPIKey() ?>",
+        v: "weekly",
+    });
+
+    let map;
+
+    async function initMap() {
+        const position = {
+            lat: <?php if (isset($lat)): ?><?= $lat ?><?php endif; ?>,
+            lng: <?php if (isset($lon)): ?><?= $lon ?><?php endif; ?>
+        };
+        const {Map} = await google.maps.importLibrary("maps");
+        const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
+
+        map = new Map(document.getElementById("map"), {
+            zoom: 6,
+            center: position,
+            mapId: "DEMO_MAP_ID",
+        });
+
+        const marker = new AdvancedMarkerElement({
+            map: map,
+            position: position,
+            title: "<?php if (isset($data)): ?><?= $data['name'] ?><?php endif;?>",
+        });
+    }
+
+    initMap();
+</script>
 </body>
 </html>
