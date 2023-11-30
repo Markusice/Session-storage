@@ -59,6 +59,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $data = requestCurrentWeatherDataByLatLon($lat, $lon);
     $data['name'] = $geocodingData[0]['name'];
 //    var_dump($data);
+
+    $timeWhenCalculated = $data['dt'];
+    $timeInTimeZone = $timeWhenCalculated + $data['timezone'];
+    try {
+        $dateTime = new DateTimeImmutable("@$timeInTimeZone");
+        $formattedTime = $dateTime->format('H:i:s');
+    } catch (Exception $e) {
+        echo $e->getMessage();
+        exit(1);
+    }
 }
 
 ?>
@@ -91,7 +101,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if (isset($data)): ?>
         <div class="text-lg font-medium grid gap-y-1 bg-indigo-100 p-4 rounded-lg w-max text-indigo-950">
-            <h2 class="text-3xl">Forecast for <?= $data['name']; ?></h2>
+            <h2 class="text-3xl">Forecast for <?= $data['name']; ?>
+                - <?php if (isset($formattedTime)): ?><?= $formattedTime ?><?php endif; ?>
+            </h2>
 
             <div class="flex items-center gap-x-1">
                 <img src="https://openweathermap.org/img/w/<?= $data['weather'][0]['icon']; ?>.png" class="weather-icon"
