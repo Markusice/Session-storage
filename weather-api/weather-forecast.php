@@ -114,35 +114,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     <?php endif; ?>
-
-    <script>
-        //document.querySelector('.form-items > button').addEventListener('click', weatherData);
-        //
-        //function weatherData(evt) {
-        //    evt.preventDefault();
-        //
-        //    let data;
-        //    const xhr = new XMLHttpRequest();
-        //    xhr.open('get', '<?php //= $openWeatherMapApiUrl ?>//')
-        //    xhr.addEventListener('load', function () {
-        //        data = this.response;
-        //        console.log(data);
-        //    });
-        //    xhr.responseType = 'json';
-        //    xhr.send(null);
-        // xhr.addEventListener('loadend', sendDataToServer);
-        //
-        // function sendDataToServer() {
-        //     const xhrToServer = new XMLHttpRequest();
-        //     xhrToServer.open('post', 'weather-ajax.php');
-        //     xhrToServer.addEventListener('load', function () {
-        //         console.log(this.response);
-        //
-        //     });
-        //     xhrToServer.send(JSON.stringify(data));
-        // }
-        // }
-    </script>
 </div>
 </body>
 </html>
