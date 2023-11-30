@@ -62,13 +62,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $timeWhenCalculated = $data['dt'];
     $timeInTimeZone = $timeWhenCalculated + $data['timezone'];
-    try {
-        $dateTime = new DateTimeImmutable("@$timeInTimeZone");
-        $formattedTime = $dateTime->format('H:i:s');
-    } catch (Exception $e) {
-        echo $e->getMessage();
-        exit(1);
-    }
+    $dateTime = new DateTimeImmutable("@$timeInTimeZone");
+    $formattedTime = $dateTime->format('H:i:s');
 }
 
 ?>
