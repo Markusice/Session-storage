@@ -34,8 +34,12 @@ $auth = new Auth(new UserStorage());
             </button>
         </form>
 
+        <form>
+
+        </form>
     <?php else: ?><a href="./login.php"
-                     class="text-lg rounded-xl w-max bg-yellow-600 p-4 flex justify-center text-neutral-50">Belépés</a><?php endif; ?>
+                     class="text-lg rounded-xl w-max bg-yellow-600 p-4 flex justify-center text-neutral-50">Belépés</a>
+    <?php endif; ?>
 
     <a href="./registration.php"
        class="text-lg rounded-xl bg-yellow-600 w-max p-4 flex justify-center text-neutral-50">Regisztráció</a>
