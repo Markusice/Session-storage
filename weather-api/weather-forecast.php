@@ -79,12 +79,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <link rel="stylesheet" href="../dist/output.css">
 </head>
-<body>
-<div class="report-container p-4 grid gap-y-5">
+<body class="dark:bg-[#121212] dark:text-white">
+<div class="p-4 grid gap-y-5">
     <form method="post" action="">
-        <div class="form-items grid gap-y-3">
+        <div class="form-items grid gap-y-3 text-lg">
             <div class="grid gap-y-2">
-                <label for="city-name" class="text-xl">City name:</label>
+                <label for="city-name">City name:</label>
                 <input type="text" name="cityName" id="city-name" required
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5">
             </div>
