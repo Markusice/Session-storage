@@ -17,33 +17,31 @@ function getAPIKey(): string
 function getResponseFromURL(string $URL): mixed
 {
     $ch = curl_init();
-    curl_setopt($ch, CURLOPT_HEADER, 0);
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
-    curl_setopt($ch, CURLOPT_URL, $URL);
-    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, 1);
-    curl_setopt($ch, CURLOPT_VERBOSE, 0);
-    curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+    $opts = [
+        CURLOPT_HEADER => 0,
+        CURLOPT_RETURNTRANSFER => 1,
+        CURLOPT_URL => $URL,
+        CURLOPT_FOLLOWLOCATION => 1,
+        CURLOPT_VERBOSE => 0,
+        CURLOPT_SSL_VERIFYPEER => false,
+    ];
+    curl_setopt_array($ch, $opts);
 
     $response = curl_exec($ch);
     curl_close($ch);
 
-    if ($response)
-        return json_decode($response);
-    return false;
+    return json_decode($response, true) ?: false;
 }
 
 function requestLocationDataByCityName(string $cityName): array | false
 {
     $cityName = urlencode($cityName);
     $geocodingAPIUrl = "https://api.openweathermap.org/geo/1.0/direct?q=$cityName&appid=" . getAPIKey();
-
-    if ($response = getResponseFromURL($geocodingAPIUrl)) {
-        return $response;
-    }
-    return false;
+    return getResponseFromURL($geocodingAPIUrl) ?: false;
 }
 
-function requestCurrentWeatherDataByLatLon(float $lat, float $lon): stdClass | false
+function requestCurrentWeatherDataByLatLon(float $lat, float $lon): array
 {
     $currentWeatherAPI = "https://api.openweathermap.org/data/2.5/weather?lat=$lat&lon=$lon&appid=" . getAPIKey() . '&units=metric';
     return getResponseFromURL($currentWeatherAPI);
@@ -55,11 +53,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (!$geocodingData) {
         redirect('weather-forecast.php');
     }
-    $lat = $geocodingData[0]->lat;
-    $lon = $geocodingData[0]->lon;
+//    var_dump($geocodingData);
+    $lat = $geocodingData[0]['lat'];
+    $lon = $geocodingData[0]['lon'];
     $data = requestCurrentWeatherDataByLatLon($lat, $lon);
-    $data->name = $geocodingData[0]->name;
-
+    $data['name'] = $geocodingData[0]['name'];
 //    var_dump($data);
 }
 
@@ -93,24 +91,24 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <?php if (isset($data)): ?>
         <div class="text-lg font-medium grid gap-y-1 bg-indigo-100 p-4 rounded-lg w-max text-indigo-950">
-            <h2 class="text-3xl">Forecast for <?= $data->name; ?></h2>
+            <h2 class="text-3xl">Forecast for <?= $data['name']; ?></h2>
 
-            <div class="weather flex items-center gap-x-1">
-                <img src="https://openweathermap.org/img/w/<?= $data->weather[0]->icon; ?>.png" class="weather-icon"
+            <div class="flex items-center gap-x-1">
+                <img src="https://openweathermap.org/img/w/<?= $data['weather'][0]['icon']; ?>.png" class="weather-icon"
                      alt="Weather icon"/>
-                <p><?= ucwords($data->weather[0]->description); ?></p>
+                <p><?= ucwords($data['weather'][0]['description']); ?></p>
             </div>
 
-            <div class="temperatures">
-                <p>Current temp: <?= $data->main->temp ?>°C</p>
-                <p>Feels like: <?= $data->main->feels_like ?>°C</p>
-                <p>Max temp: <?= $data->main->temp_max; ?>°C</p>
-                <p>Min temp: <?= $data->main->temp_min; ?>°C</p>
+            <div>
+                <p>Current temp: <?= $data['main']['temp'] ?>°C</p>
+                <p>Feels like: <?= $data['main']['feels_like'] ?>°C</p>
+                <p>Max temp: <?= $data['main']['temp_max']; ?>°C</p>
+                <p>Min temp: <?= $data['main']['temp_min']; ?>°C</p>
             </div>
 
-            <div class="time">
-                <p>Humidity: <?= $data->main->humidity; ?>%</p>
-                <p>Wind: <?= $data->wind->speed; ?> km/h</p>
+            <div>
+                <p>Humidity: <?= $data['main']['humidity']; ?>%</p>
+                <p>Wind: <?= $data['wind']['speed']; ?> km/h</p>
             </div>
         </div>
     <?php endif; ?>
