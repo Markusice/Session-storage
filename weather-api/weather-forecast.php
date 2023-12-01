@@ -82,30 +82,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     <title>Weather Forecast</title>
 
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=default"></script>
+
     <link rel="stylesheet" href="../dist/output.css">
 </head>
 <body class="dark:bg-[#121212] dark:text-white">
-<div class="p-6 grid grid-cols-[repeat(2,max-content)] gap-6">
+<div class="p-6 grid auto-cols-[minmax(250px,_1fr)] xl:grid-cols-[max-content,_minmax(auto,_70rem)] gap-5">
     <form method="post" action="">
-        <div class="form-items grid gap-y-3 text-lg">
+        <div class="form-items grid gap-y-3 text-lg bg-indigo-100 rounded-lg w-max p-4 text-indigo-950">
             <div class="grid gap-y-2">
                 <label for="city-name">City name:</label>
                 <input type="text" name="cityName" id="city-name" required
                        class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-60 p-2.5">
             </div>
-            <button type="submit" class="rounded-xl w-28 bg-yellow-600 py-3 flex justify-center text-neutral-50">
+            <button type="submit"
+                    class="rounded-xl w-28 tracking-wide bg-yellow-600 py-3 flex justify-center text-neutral-50">
                 Forecast
             </button>
         </div>
     </form>
 
     <?php if (isset($data)): ?>
-        <div class="row-start-2 text-lg font-medium grid gap-y-1 bg-indigo-100 p-4 rounded-lg w-max text-indigo-950">
+        <div class="xl:row-start-2 max-w-xl text-lg font-medium grid gap-y-1 bg-indigo-100 p-4 rounded-lg text-indigo-950">
             <h2 class="text-3xl">Forecast for <?= $data['name']; ?>
                 - <?php if (isset($formattedTime)): ?><?= $formattedTime ?><?php endif; ?>
             </h2>
 
-            <div class="flex items-center gap-x-1">
+            <div class="flex items-center gap-x-2">
                 <img src="https://openweathermap.org/img/w/<?= $data['weather'][0]['icon']; ?>.png" class="weather-icon"
                      alt="Weather icon"/>
                 <p><?= ucwords($data['weather'][0]['description']); ?></p>
@@ -126,7 +129,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     <?php endif; ?>
 
-    <div id="map" class="row-start-2 h-[400px] w-[800px] rounded-md"></div>
+    <?php $canInitMap = isset($data) && isset($lat) && isset($lon) ?>
+    <?php if ($canInitMap): ?>
+        <div id="map" class="xl:row-start-2 h-[30rem] w-full rounded-md">
+        </div>
+    <?php endif; ?>
 </div>
 <script>
     (g => {
@@ -155,8 +162,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     async function initMap() {
         const position = {
-            lat: <?php if (isset($lat)): ?><?= $lat ?><?php endif; ?>,
-            lng: <?php if (isset($lon)): ?><?= $lon ?><?php endif; ?>
+            lat: <?php if (isset($lat)): ?><?= $lat ?><?php else: ?><?= 0 ?><?php endif;?>,
+            lng: <?php if (isset($lon)): ?><?= $lon ?><?php else: ?><?= 0 ?><?php endif;?>,
         };
         const {Map} = await google.maps.importLibrary("maps");
         const {AdvancedMarkerElement} = await google.maps.importLibrary("marker");
@@ -170,11 +177,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         const marker = new AdvancedMarkerElement({
             map: map,
             position: position,
-            title: "<?php if (isset($data)): ?><?= $data['name'] ?><?php endif;?>",
+            title: "<?php if (isset($data['name'])): ?><?= $data['name'] ?><?php endif;?>",
         });
     }
 
-    initMap();
+    const canInitMap = <?= $canInitMap ? 'true' : 'false' ?>;
+    if (canInitMap) {
+        initMap();
+    }
 </script>
 </body>
 </html>
