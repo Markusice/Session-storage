@@ -86,7 +86,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <link rel="stylesheet" href="../dist/output.css">
 </head>
-<body class="dark:bg-[#121212] dark:text-white">
+<body class=" dark:bg-[#121212] dark:text-white">
 <div class="p-6 grid auto-cols-[minmax(250px,_1fr)] xl:grid-cols-[max-content,_minmax(auto,_70rem)] gap-5">
     <form method="post" action="">
         <div class="form-items grid gap-y-3 text-lg bg-indigo-100 rounded-lg w-max p-4 text-indigo-950">
