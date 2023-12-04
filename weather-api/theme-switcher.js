@@ -1,0 +1,5 @@
+function switchTheme() {
+
+}
+
+export {switchTheme}
